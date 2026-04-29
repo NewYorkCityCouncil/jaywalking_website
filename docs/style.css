@@ -1,0 +1,213 @@
+/* style.css - Custom CSS for Crosswalk Project */
+
+/* Base font and box-sizing for consistency */
+html, body {
+  font-family: 'Inter', 'Lato', 'Segoe UI', Arial, sans-serif;
+  box-sizing: border-box;
+  color: #1B1C22;
+  line-height: 1.6;
+  font-size: 1.06rem;
+  background: #f7f8fb;
+  margin: 0;
+  padding: 0;
+}
+
+*, *:before, *:after { box-sizing: inherit; }
+
+/* Overlay Section Panels */
+.cr-section {
+  background: rgba(255,255,255,0.30); /*subtle overlay*/
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(60,60,90,0.08);
+  padding: 2.5em 2em;
+  /* max-width: 700px; */
+  /* margin: 2.5em auto; */
+  transition: box-shadow 0.2s;
+}
+
+/*fade-scroll class*/
+.fade-scroll {
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(.4,0,.2,1);
+  will-change: opacity;
+}
+.fade-scroll.visible {
+  opacity: 1;
+}
+
+/* Overlay Center Panels */
+.overlay-center {
+  text-align: center;
+}
+
+.bg-crosswalk {
+  background-image: url('https://images.unsplash.com/photo-1581282214487-fe1e365cade1?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDUyNjUyNzZ8&ixlib=rb-4.0.3&q=85-bg.jpg');
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+/* Responsive max-width for mobile */
+@media (max-width: 800px) {
+  .cr-section {
+    max-width: 100%;
+    padding: 1.2em 1em;
+  }
+}
+
+/* Headings & Narrative Headers */
+bigheader {
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-family: 'Inter', 'sans-serif';
+  letter-spacing: 0.02em;
+  color: #12235a;
+  margin-bottom: 0.1em;
+}
+
+smallheader {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: 'Inter', 'sans-serif';
+  color: #3b4e85;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.6em;
+}
+
+/* Section Dividers and Spacing */
+hr {
+  border: none;
+  border-top: 1.5px solid #eceef1;
+  margin: 2.3em 0 2em 0;
+}
+
+.cr-section + .cr-section {
+  margin-top: 3.5em;
+}
+
+/* Blockquotes & Pull Quotes */
+blockquote {
+  background: rgba(245,247,253,0.95);
+  border-left: 4px solid #4078c0;
+  color: #203049;
+  margin: 2em 0;
+  padding: 1.2em 2em 1.2em 1.4em;
+  border-radius: 8px;
+  font-size: 1.04em;
+  font-style:italic;
+}
+
+/* Callout Boxes */
+.callout, .callout-info {
+  background-color: #f1f7ff;
+  border-left: 4px solid #49a9ee;
+  color: #225;
+  padding: 1em 1.3em;
+  margin: 1em 0 1.3em 0;
+  border-radius: 7px;
+}
+
+.callout-important {
+  background-color: #ffeacc;
+  border-left: 4px solid #fdc16a;
+  color: #64411e;
+}
+
+/* Data Viz + Map Containers */
+iframe, .chart, .leaflet-container {
+  width: 100% !important;
+  min-height: 340px;
+  max-width: 100%;
+  border-radius: 12px;
+  border: none;
+  margin: 1em 0 1.8em 0;
+  box-shadow: 0 1px 7px rgba(40,80,140,0.04);
+}
+
+@media (max-width:600px) {
+  iframe, .leaflet-container { min-height: 220px; }
+}
+
+/* Chart Axis, Legends, and Tooltips (suggested overrides) */
+.axis text,
+.legend-group text {
+  font-family: inherit;
+  font-size: 1em;
+  fill: #2a2a2a;
+}
+
+.tooltip, .d3-tip {
+  background: rgba(25,25,45,0.95);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 1em;
+  padding: 8px 13px;
+  box-shadow: 0 1px 4px rgba(40,40,60,0.13);
+}
+
+/* Accent Buttons and Inline Links */
+a.button, button, .btn {
+  background-color: #3166dd;
+  color: #fff !important;
+  border: none;
+  border-radius: 4px;
+  padding: 9px 20px;
+  font-weight: 600;
+  font-size: 1.1em;
+  margin: .7em 0;
+  text-decoration: none;
+  transition: background 0.18s;
+}
+
+a.button:hover, button:hover, .btn:hover {
+  background-color: #193770;
+}
+
+a {
+  color: #3867d6;
+  text-decoration: underline;
+}
+a:hover { color: #12235a; }
+
+/* Illustrative Section Icons */
+.section-icon {
+  width: 2rem;
+  height: 2rem;
+  vertical-align: middle;
+  margin-right: 0.5em;
+  opacity: 0.88;
+}
+
+#ojs-cell-5 > div > svg > g:nth-child(9) > text {
+  font-size: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Animations for visuals */
+.fade-in {
+  animation: fadeIn 1.2s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+/* Miscellaneous Enhancements */
+::-webkit-scrollbar { width: 8px; background: #f0f3fa;}
+::-webkit-scrollbar-thumb { background: #dadbef; border-radius:6px;}
+
+
+/* .test .trigger p{
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+} */
+
+/* #cr-summons-over-time, #cr-precincts, #cr-race-enforcement, #cr-race{
+  background-color: white;
+  border-radius: 20px;
+} */

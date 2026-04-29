@@ -1,0 +1,919 @@
+---
+# title: "Jaywalking"
+format: 
+  closeread-html:
+    cr-style:
+      narrative-background-color-overlay: white
+      narrative-text-color-overlay: black
+      narrative-overlay-max-width: 850px
+      narrative-background-color-sidebar: transparent
+    # include-in-header: 
+    #   - text: |
+    #       <script src="fade-scroll.js"></script>
+css:
+  - style.css
+---
+
+::: {.cr-section .bg-crosswalk layout="overlay-center"}
+<bigheader>Decriminalizing Everyday Behavior</bigheader><br> How Data Helped Drive a Policy Shift on Jaywalking
+
+Jaywalking has long been a technically illegal—but commonly overlooked—act in New York City. The concept of jaywalking has been part of the urban landscape since the 1920s, when the rise of automobiles prompted changes to traffic laws that prioritized vehicles over pedestrians, shifting the burden of safety onto those on foot.
+
+But in 2025, New York City repealed its jaywalking law, joining a growing number of cities that have chosen to stop criminalizing this everyday action. What led to this shift?
+
+Lets explore how data on enforcement patterns, public safety, and historical policy context helped shape the conversation around jaywalking—and how similar evidence-based approaches might support future legislation. 
+:::
+
+:::: {.cr-section}
+<smallheader>Was Jaywalking Ever Really Enforced?</smallheader><br> Jaywalking enforcement in NYC has always been sparse. In 2024, just 867 summonses were issued citywide—a minuscule figure in a city of over 8 million people. Yet even this small number reveals patterns that raise questions about fairness and focus. <br> Despite the low number of summonses, the underlying question remains... @cr-summons-over-time
+
+::: {#cr-summons-over-time}
+```{ojs}
+// Import Plot with additional tooltip functionality from this notebook
+import {Plot} from "@mkfreeman/plot-tooltip"
+
+Plot.plot({x: {
+    label: "Year",
+    ticks: yearTicks,
+    tickFormat: d => d.slice(0, 4) // Show only the year
+  },
+  y: {
+    grid: true,
+  },
+  style: {
+    color: "black",
+  },
+  marks: [
+  
+  Plot.dot(summons_data, {
+    x: "quarter",
+    y: "total_summonses",
+    title: d => `${d.quarter}: ${d.total_summonses} summonses`,
+    r: 3,
+    fill: "currentColor",
+    fillOpacity: 1
+  }),
+  Plot.line(summons_data, {
+    x: "quarter", 
+    y: "total_summonses"})
+  ]
+
+})
+
+```
+
+```{ojs}
+summons_csv = FileAttachment("jaywalking-crim-summonses_quarterly.csv").csv({typed: true})
+
+summons_data = summons_csv.map(d => ({
+  ...d,
+  total_summonses: +d.total_summonses,
+  year: d.quarter.slice(0, 4)
+}))
+
+yearTicks = summons_data.filter(d => d.quarter.endsWith("Q1")).map(d => d.quarter)
+```
+:::
+::::
+
+:::: {.cr-section .bg-crosswalk layout="overlay-center"}
+Who is most affected by these rarely enforced violations?
+::::
+
+:::: {.cr-section}
+<smallheader>Racial Disparities in Enforcement</smallheader><br> Enforcement of jaywalking laws in New York City revealed significant racial and geographic disparities. @cr-race
+
+::: {#cr-race}
+```{ojs}
+// Define the chart as an object with methods
+groupedbarchart = { 
+  return{
+  // Properties
+  svg: null,
+  g: null,
+  tooltip: null,
+  x0: null,
+  x1: null,
+  y: null,
+  color: null,
+  width: 0,
+  height: 0,
+
+  // Default options
+  config: {
+    margin: {top: 60, right: 5, bottom: 20, left: 5},
+    totalWidth: Math.min(width, 640),
+    totalHeight: 400,
+    groupColumn: "year",            // Column for main groups (x-axis)
+    subgroupColumn: "race_recoded", // Column for subgroups (bars within groups)
+    valueColumn: "count",           // Column for values (height of bars)
+    valueLabel: "Count",
+    colorScheme: d3.schemeCategory10,
+    transitionDuration: 200,
+    initialData: initial_data
+  },
+  
+  // Helper function to get unique values
+  getUniqueValues(data, key) {
+    return [...new Set(data.map(d => d[key]))];
+  },
+  
+  // Initialize the chart
+  initialize(options = {}) {
+    // Merge provided options with defaults
+    this.config = {...this.config, ...options};
+    this.currentData = this.config.initialData || [];
+
+    // Set dimensions
+    this.width = this.config.totalWidth - this.config.margin.left - this.config.margin.right;
+    this.height = this.config.totalHeight - this.config.margin.top - this.config.margin.bottom;
+    
+    // Create SVG
+    this.svg = d3.create("svg")
+      .attr("viewBox", [0, 0, this.config.totalWidth, this.config.totalHeight])
+      .attr("width", this.width)
+      .attr("height", this.height);
+    
+    // Create tooltip div
+    this.tooltip = d3.select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0)
+      .style("position", "absolute")
+      .style("text-align", "center")
+      .style("padding", "8px")
+      .style("font", "12px sans-serif")
+      .style("background", "rgba(0, 0, 0, 0.7)")
+      .style("color", "white")
+      .style("border-radius", "4px")
+      .style("pointer-events", "none");
+    
+    // Create a group element to hold the chart
+    this.g = this.svg.append("g")
+      .attr("transform", `translate(${this.config.margin.left},${this.config.margin.top})`);
+    
+    // Create axes groups (but don't populate yet)
+    this.g.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${this.height})`);
+    
+    this.g.append("g")
+      .attr("class", "y-axis");
+
+    // Create a group for the legend
+    this.g.append("g")
+      .attr("class", "legend-group")
+      .attr("transform", `translate(0, -40)`);
+
+    // Create axes label
+    this.g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - this.config.margin.left-40)
+      .attr("x", 0)
+      .attr("dy", "1em")
+      .style("text-anchor", "end")
+      .style("font-size", "12px")
+      .text(this.config.valueLabel + " →");
+      
+    // Initialize scales with current data
+    this.updateScales(this.currentData);
+
+    // Draw axes but do NOT draw bars yet
+    this.g.select(".x-axis")
+      .call(d3.axisBottom(this.x0));
+
+    this.g.select(".y-axis")
+      .call(d3.axisLeft(this.y));
+
+    // Draw the legend (optional, can skip or update later)
+    this.updateLegend();
+    
+    return this.svg.node();
+  },
+  
+  // Update scales based on new data
+  updateScales(data) {
+    const { groupColumn, subgroupColumn, valueColumn, colorScheme } = this.config;
+
+    // X0 Scale - For Years
+    this.x0 = d3.scaleBand()
+      .domain(this.getUniqueValues(data, groupColumn))
+      .rangeRound([0, this.width])
+      .padding(0.1);
+    
+    // X1 Scale - For Race Groups Within Years
+    this.x1 = d3.scaleBand()
+      .domain(this.getUniqueValues(data, subgroupColumn))
+      .rangeRound([0, this.x0.bandwidth()])
+      .padding(0.05);
+    
+    // Y Scale
+    this.y = d3.scaleLinear()
+      .domain([0, d3.max(data, d => +d[valueColumn])])
+      .nice()
+      .rangeRound([this.height, 0]);
+    
+    // Color Scale
+    this.color = d3.scaleOrdinal()
+      .domain(this.getUniqueValues(data, subgroupColumn))
+      .range(colorScheme);
+  },
+
+  // Create or update the legend
+  updateLegend() {
+    const { subgroupColumn, transitionDuration } = this.config;
+    const subgroupCategories = this.getUniqueValues(this.currentData, subgroupColumn);
+    const legendPadding = 25; // Padding between legend items (includes rect width + spacing)
+
+    // Select the legend group
+    const legend = this.g.select(".legend-group");
+    
+    // Calculate dynamic widths based on text content
+    // We'll create a temporary text element to measure text widths
+    const tempText = this.svg.append("text")
+      .style("font-size", "12px")
+      .style("opacity", 0);
+    
+    // Calculate the width needed for each category text
+    const textWidths = subgroupCategories.map(category => {
+      tempText.text(category);
+      return tempText.node().getComputedTextLength();
+    });
+    
+    // Remove the temporary text element
+    tempText.remove();
+    
+    // Determine if we need multiple rows
+    let totalWidth = 0;
+    subgroupCategories.forEach((_, i) => {
+      totalWidth += 20 + textWidths[i] + legendPadding; // rect width + text width + padding
+    });
+    
+    const needsMultipleRows = totalWidth > this.width;
+    const itemsPerRow = needsMultipleRows 
+      ? Math.max(2, Math.floor(this.width / (totalWidth / subgroupCategories.length)))
+      : subgroupCategories.length;
+    
+    // Create data structure for legend layout
+    const legendData = subgroupCategories.map((category, i) => {
+      const row = Math.floor(i / itemsPerRow);
+      const col = i % itemsPerRow;
+      
+      // Calculate x position within row
+      let xPos = 0;
+      for (let j = 0; j < col; j++) {
+        const idx = row * itemsPerRow + j;
+        if (idx < textWidths.length) {
+          xPos += 20 + textWidths[idx] + legendPadding;
+        }
+      }
+      
+      return {
+        category,
+        x: xPos,
+        y: row * 25, // 25px height per row
+        width: textWidths[i],
+        color: this.color(category)
+      };
+    });
+    
+    // Adjust legend group vertical position if we have multiple rows
+    const maxRow = Math.max(...legendData.map(d => d.y)) / 25;
+    legend.transition()
+      .duration(transitionDuration)
+      .attr("transform", `translate(0, ${maxRow > 0 ? -40 - (maxRow * 10) : -40})`);
+    
+    // Update legend items with transitions
+    const legendItems = legend.selectAll(".legend-item")
+      .data(legendData, d => d.category); // Use category as key for stable transitions
+    
+    // Remove exiting items with transition
+    legendItems.exit()
+      .transition()
+      .duration(transitionDuration)
+      .style("opacity", 0)
+      .remove();
+    
+    // Create enter selection
+    const enterItems = legendItems.enter()
+      .append("g")
+      .attr("class", "legend-item")
+      .style("opacity", 0)
+      .attr("transform", d => `translate(${d.x}, ${d.y})`);
+    
+    // Add colored rectangles to enter selection
+    enterItems.append("rect")
+      .attr("width", 15)
+      .attr("height", 15)
+      .attr("fill", d => d.color);
+    
+    // Add text labels to enter selection
+    enterItems.append("text")
+      .attr("x", 20)
+      .attr("y", 12.5)
+      .style("font-size", "12px")
+      .text(d => d.category);
+    
+    // Merge enter and update selections
+    const allItems = legendItems.merge(enterItems);
+    
+    // Apply transitions to all items
+    allItems.transition()
+      .duration(transitionDuration)
+      .style("opacity", 1)
+      .attr("transform", d => `translate(${d.x}, ${d.y})`);
+    
+    // Update rectangle colors with transition
+    allItems.select("rect")
+      .transition()
+      .duration(transitionDuration)
+      .attr("fill", d => d.color);
+    
+    // Update text with transition
+    allItems.select("text")
+      .transition()
+      .duration(transitionDuration)
+      .text(d => d.category);
+  },
+  
+  // Update the chart with new data
+  updateChart(data) {
+    const { groupColumn, subgroupColumn, valueColumn, transitionDuration } = this.config;
+    
+    // Store the current data
+    this.currentData = data;
+    
+    // Update scales with new data
+    this.updateScales(data);
+
+    // Update the legend
+    this.updateLegend();
+    
+    // This creates a nested structure where each year has an array of data points
+    let nestedData = d3.group(data, d => d[groupColumn]);
+    
+    // Update X axis
+    this.g.select(".x-axis")
+      .transition()
+      .duration(transitionDuration)
+      .call(d3.axisBottom(this.x0));
+    
+    // Update Y axis
+    this.g.select(".y-axis")
+      .transition()
+      .duration(transitionDuration)
+      .call(d3.axisLeft(this.y));
+    
+    // UPDATE: Group groups (enter, update, exit pattern)
+    let groupElements = this.g.selectAll(".group-element")
+      .data(nestedData);
+    
+    // Add new group elements
+    const newGroupElements = groupElements.enter()
+      .append("g")
+      .attr("class", "group-element");
+    
+    // Merge existing and new group elements
+    groupElements.merge(newGroupElements)
+      .transition()
+      .duration(transitionDuration)
+      .attr("transform", d => `translate(${this.x0(d[0])},0)`);
+
+    // Remove old group elements
+    groupElements.exit()
+      .transition()
+      .duration(transitionDuration)
+      .style("opacity", 0)
+      .remove();
+    
+    // Update bars within each group
+    groupElements.merge(newGroupElements)
+      .selectAll(".bar")
+      .data(d => d[1])
+      .join(
+        enter => enter.append("rect")
+          .attr("class", "bar")
+          .attr("y", this.height)
+          .attr("height", 0),
+        update => update,
+        exit => exit.transition()
+          .duration(transitionDuration)
+          .attr("y", this.height)
+          .attr("height", 0)
+          .remove()
+      )
+      .transition()
+      .duration(transitionDuration)
+      .attr("x", d => this.x1(d[subgroupColumn]))
+      .attr("y", d => this.y(d[valueColumn]))
+      .attr("width", this.x1.bandwidth())
+      .attr("height", d => this.height - this.y(d[valueColumn]))
+      .attr("fill", d => this.color(d[subgroupColumn]));
+      
+    // Add event listeners to new bars
+    this.addBarEventListeners(groupElements.merge(newGroupElements)
+      .selectAll(".bar"));
+  },
+  
+  // Add event listeners to bars for tooltips
+  addBarEventListeners(selection) {
+    const { groupColumn, subgroupColumn, valueColumn } = this.config;
+    const self = this; 
+
+    selection
+      .on("mouseover", function(event, d) {
+      // Store original color and apply hover effect
+        const originalColor = d3.select(this).attr("fill");
+        d3.select(this).attr("data-original-color", originalColor);
+        self.tooltip.transition()
+          .duration(200)
+          .style("opacity", 0.9);
+        self.tooltip.html(`${groupColumn}: ${d[groupColumn]}<br>${subgroupColumn}: ${d[subgroupColumn]}<br>${valueColumn}: ${d[valueColumn]}`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+        d3.select(this)
+              .transition()
+              .duration(200)
+              .attr("fill", d3.color(originalColor).brighter(0.5));
+        d3.select()
+      })
+      .on("mousemove", function(event) {
+        self.tooltip
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function() {
+        // Restore original color
+        const originalColor = d3.select(this).attr("data-original-color");
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr("fill", originalColor);
+        self.tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
+  }
+};
+};
+
+groupedbarchart.initialize();
+
+function race_update(currentprog) {
+  if (currentprog < 1.1) {
+    groupedbarchart.updateChart(initial_data);
+  // }else if (currentprog >= 0.7 && currentprog < 0.9){
+  //   groupedbarchart.updateChart(jwalkrace5_data.filter(d => +d.year < 2019));
+  // }else if (currentprog > 0.9 && currentprog < 1.2){
+  //   console.log("rounded progress: ", rounded_progress,
+  //     "progress: ", progress
+  //   );
+  //   groupedbarchart.updateChart(jwalkrace5_data.filter(d => +d.year < 2020));
+  }else if (currentprog >= 1.1 && currentprog < 1.5){
+    groupedbarchart.updateChart(jwalkrace5_data.filter(d => +d.year < 2021));
+  // }else if (currentprog >= 1.5 && currentprog < 1.7){
+  //   groupedbarchart.updateChart(jwalkrace5_data.filter(d => +d.year < 2022));
+  // }else if (currentprog >= 1.7 && currentprog < 1.9){
+  //   groupedbarchart.updateChart(jwalkrace5_data.filter(d => +d.year < 2023));
+  }else if (currentprog >= 1.5 && currentprog <= 3.1){
+    groupedbarchart.updateChart(jwalkrace5_data);
+  // }else if (currentprog >= 2.0 && currentprog <= 3.0){
+  //   groupedbarchart.updateChart(jwalkrace5_data.filter(d => +d.year == 2024));
+  }else if(currentprog > 3.1){
+    groupedbarchart.updateChart(jwalkrace2_data);
+  }
+}
+```
+
+```{ojs}
+jwalkrace5_data = FileAttachment("jaywalking_race_5.csv").csv({typed: true})
+jwalkrace2_data = FileAttachment("jaywalking_race_2.csv").csv({typed: true})
+
+initial_data = jwalkrace5_data.filter(function(d){ return d.year < 2018 });
+
+test212 = race_update(race_progress)
+```
+:::
+
+Throughout the years, Black individuals have accounted for 40% to 70% of jaywalking summonses, while Hispanic individuals have consistently accounted for 30% to 37%. @cr-race
+
+In 2024 alone, 62% of summonses were issued to Black individuals and 31% to Hispanic individuals. [@cr-race]{pan-to="-70%,-15%" scale-by="2.5"}
+
+This means that, historically, Black and Hispanic individuals have accounted for at least 80% of all jaywalking summonses, with 2024 reaching the highest recorded share at 93%. Despite this disproportionate distribution of enforcement, there is no evidence to suggest that over 90% of jaywalking in the city is committed by individuals from these communities. Many have argued that jaywalking summonses have often been used as a pretext to target Black and Latino New Yorkers. @cr-race
+::::
+
+:::: cr-section
+<smallheader>Geographic Disparities in Enforcement</smallheader> <br> Geographic patterns show a clear concentration of enforcement. In 2024, just ten precincts—spanning neighborhoods like Jackson Heights (115), Downtown Brooklyn (84), Coney Island (60), Harlem (28 and 32), Jamaica (103), Bedford-Stuyvesant (79), the South Bronx (40), Elmhurst (110), and East Harlem (25)—accounted for over 50% of all jaywalking summonses issued citywide. Many of these precincts are in communities of color, raising ongoing concerns about the uneven application of enforcement. @cr-leafletmap
+
+::: {#cr-leafletmap}
+<!-- Inserting an iframe into closeread section -->
+
+```{=html}
+<iframe src="https://newyorkcitycouncil.github.io/jaywalking/visuals/jaywalking-summonses_per10K_2024_by-precinct.html" frameborder="0" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+```
+:::
+::::
+
+::: {.cr-section .bg-crosswalk layout="overlay-center"}
+<smallheader>Jaywalking and Pedestrian Safety</smallheader><br> Supporters of jaywalking enforcement often cite pedestrian safety as the primary rationale. But when we examine the data, the relationship between jaywalking citations and pedestrian risk is less straightforward.
+
+There is little evidence to support the claim that decriminalizing jaywalking will result in a more dangerous experience for pedestrians. Neither the Mayor’s administration nor the NYPD appears to view jaywalking enforcement as a safety measure, given that only 47 of the City’s 77 precincts issued jaywalking summonses in 2023. Additionally, jaywalking enforcement has not consistently targeted the areas where pedestrians are most often injured.
+:::
+
+:::: {.cr-section}
+Priority zones—areas the city has identified as having the highest rates of pedestrian injuries and deaths—are home to a significant portion of both pedestrian fatalities and enforcement. These zones are approximately 73% non-white, and account for 52% of all pedestrian-related deaths citywide. Yet, 58% of jaywalking summonses are issued in these same zones—92% of them to non-white individuals. @cr-leafletmap2
+
+::: {#cr-leafletmap2}
+```{=html}
+<iframe src="https://newyorkcitycouncil.github.io/jaywalking/visuals/jaywalking-locations_in_priority-zones_2017-2024.html" frameborder="0" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+```
+:::
+::::
+
+:::: {.cr-section}
+The racial disparity is clear, but the alignment with pedestrian danger is not always consistent. @cr-precincts
+
+Five precincts ([**25**]{style="color:#660000;"}, [**28**]{style="color:#1850b5;"}, [**32**]{style="color:#ba9f64;"}, [**33**]{style="color:#1f3a70;"}, and [**76**]{style="color:#b3b3ff;"}), for instance, are in the top 25th percentile for jaywalking summonses [@cr-precincts]{pan-to="35%,65%" scale-by="1.75"}
+
+Yet fall in the bottom 25th percentile for pedestrian-related car crashes. This mismatch suggests that enforcement may not be driven by safety considerations alone. [@cr-precincts]{pan-to="60%,-60%" scale-by="2.5"}
+
+While we don't see a clear link between pedestrian-related crashes and jaywalking summonses, another question comes up: will legalizing jaywalking lead to more pedestrian crashes? To assess whether decriminalizing jaywalking compromises safety, we looked at peer cities that have repealed similar laws. @cr-precincts
+
+::: {#cr-precincts}
+```{ojs}
+barcharttest = Plot.plot({
+  height: precinct_data.length * 7,
+  marginLeft: 45,
+  x: {grid: true, domain: [0,6.5]},
+  y: {label: "Police Precinct"},
+  marks: [
+    Plot.barX(precinct_data,{
+      x: "percent_jaywalking_summonses",
+      y: "precinct",
+      fill: "black",
+      render: (index, scales, values, dimensions, context, next) => {
+        const {x,y} = scales;
+        const Y = y.domain();
+        const X = x.domain();
+        const g = next(index, scales, values, dimensions, context);
+        const tooltip = d3.select("body")
+          .append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0)
+          .style("position", "absolute")
+          .style("text-align", "left")
+          .style("padding", "8px")
+          .style("font", "12px sans-serif")
+          .style("background", "rgba(0, 0, 0, 0.7)")
+          .style("color", "white")
+          .style("border-radius", "4px")
+          .style("pointer-events", "none");
+
+        const marginL = dimensions.marginLeft;
+        const svg = context.ownerSVGElement;
+        svg.update = (newData, indexColumn, valueColumn, reverse = null, sortBy = null, newxLabel=null, highlighted_specifics=null, highlight_color_palette = null) => {
+          if (reverse && sortBy) {
+            if(reverse == 'no'){
+              var sortedData = sortData(newData,sortBy);
+              } else if(reverse == 'yes'){
+              var sortedData = sortData(newData,sortBy,true);
+              } else{
+              var sortedData = newData;
+              console.log("reverse argument needs to be yes or no.");
+              }
+          }else{
+            var sortedData = newData;
+          };
+          
+          // console.log(sortedData);
+          const initialColumnValues = newData.map(row => row[valueColumn]);
+          const initialColumnIndices = newData.map(row => row[indexColumn]);
+          const columnValues = getColumn(sortedData,valueColumn);
+          const indexValues = getColumn(sortedData,indexColumn);
+          let highlightPalette;
+
+          // Highlight specific y-axis
+          if (highlighted_specifics){
+            if (highlight_color_palette && Array.isArray(highlight_color_palette)) {
+              highlightPalette = highlight_color_palette;
+            } else {
+              highlightPalette = d3.schemeSet2;
+            };
+            // Map each highlighted value to a color from the palette (by position)
+            // Create a lookup
+            const highlightMap = new Map();
+            highlighted_specifics.forEach((val, i) => {
+              highlightMap.set(val, highlightPalette[i % highlightPalette.length]);
+            });
+
+            const set1 = new Set(highlighted_specifics || []);
+            var fillopacity = newData.map(i => set1.has(i[indexColumn])?1:0.4);
+            var color = newData.map(i => set1.has(i[indexColumn]) ? highlightMap.get(i[indexColumn]) : null); // null triggers parent <g>
+          } else{
+            var fillopacity = newData.map(i => 0.7);
+            var color = newData.map(() => null); // no highlights; triggers parent <g>
+          };
+          // console.log(highlighted_specifics);
+          // console.log(fillopacity);
+
+          // Update arrangement based on indexValues order
+          y.domain(indexValues);
+
+          // Update the bars
+          d3
+            .select(g)
+            .selectAll("rect")
+            .transition()
+            .duration(300)
+            .attr("width", (i) => x(initialColumnValues[i]) - marginL)
+            .attr("fill-opacity", (i) => fillopacity[i])
+            .attr("fill", function(i) {
+              // Use highlight color if set
+              if (color[i]) return color[i];
+              // Otherwise, use parent <g> fill, fallback to "steelblue"
+              return d3.select(this.parentNode).attr("fill") || "steelblue";
+            })
+            .attr("y", (i) => y(Y[i]));
+
+          // Update the y-axis ticks to follow the bars associated with index
+          d3
+            .select(svg)
+            .selectAll("[aria-label^='y-axis tick']>*")
+            .transition()
+            .duration(300)
+            .attr("transform", (i) => `translate(${marginL},${y(Y[i])})`);
+          
+          // Update x-axis label if provided
+          if (newxLabel) {
+            d3
+              .select(svg)
+              .select("[aria-label^='x-axis label']>text")
+              .transition()
+              .duration(750)
+              .text(newxLabel + " →");
+          };
+
+          // Update tooltips and hover color
+          d3
+          .select(g)
+          .selectAll("rect")
+          .on("mouseover", function(event, i) {
+            // Show tooltip
+            tooltip.style("opacity", 1)
+              .html(`${indexColumn}: ${initialColumnIndices[i]} <br> ${valueColumn}: ${initialColumnValues[i]}`)
+              .style("left", event.pageX + "px")
+              .style("top", event.pageY + "px");
+            
+            const sel = d3.select(this);
+            const parentG = d3.select(this.parentNode);
+            // Store original fill and opacity
+            // Conditionally store original fill
+            let originalFill = sel.attr("fill");
+            if (!originalFill) {
+              originalFill = parentG.attr("fill");
+            };
+            const originalOpacity = sel.style("opacity") || 1;
+
+            sel.attr("data-original-fill", originalFill);
+            sel.attr("data-original-opacity", originalOpacity);
+
+            // Apply hover effect: decrease opacity by 0.3 (not below 0)
+            const newOpacity = Math.max(parseFloat(originalOpacity) - 0.3, 0);
+
+            sel.transition()
+              .duration(200)
+              .style("opacity", newOpacity);
+          })
+          .on("mouseout", function(event, i) {
+            tooltip.style("opacity", 0);
+
+            const sel = d3.select(this);
+
+            // Restore original fill and opacity
+            const originalFill = sel.attr("data-original-fill") || "black";
+            const originalOpacity = sel.attr("data-original-opacity") || 1;
+
+            sel.transition()
+              .duration(100)
+              .attr("fill", originalFill)
+              .style("opacity", originalOpacity);
+        });
+
+          }
+
+          // scales.fillOpacity();
+          // values.fillOpacity = precinct_data.map(i => 0.7);
+        // console.log(dimensions);
+        // console.log(scales.y.domain());
+        // console.log(Object.isFrozen(scales.scales.x));
+        // console.log(values.fillOpacity);
+        return g;
+
+      }
+    }),
+    Plot.axisY({fontSize: 6.5})]
+});
+```
+
+```{ojs}
+precinct_data = FileAttachment("summonses-vs-ksi_by-precinct_2017-2024.csv").csv({typed: true});
+
+function sortData(data, columnName, reverse = false) {
+  // Validate inputs
+  if (!Array.isArray(data)) {
+    throw new Error('Data must be an array');
+  }
+  if (!data.length) {
+    return data; // Return empty array as-is
+  }
+  if (!columnName || typeof columnName !== 'string') {
+    throw new Error('Column name must be a non-empty string');
+  }
+  // Check if column exists in the data
+  if (!(columnName in data[0])) {
+    throw new Error(`Column "${columnName}" not found in data`);
+  }
+  // Create a copy to avoid mutating original data
+  const sortedData = [...data];
+
+  // Sort the data
+  sortedData.sort((a, b) => {
+    const aVal = a[columnName];
+    const bVal = b[columnName];
+    
+    // Handle null/undefined values
+    if (aVal == null && bVal == null) return 0;
+    if (aVal == null) return reverse ? -1 : 1;
+    if (bVal == null) return reverse ? 1 : -1;
+    
+    // Handle numbers
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return reverse ? bVal - aVal : aVal - bVal;
+    }
+    
+    // Handle strings (case-insensitive)
+    if (typeof aVal === 'string' && typeof bVal === 'string') {
+      const comparison = aVal.toLowerCase().localeCompare(bVal.toLowerCase());
+      return reverse ? -comparison : comparison;
+    }
+    
+    // Handle dates
+    if (aVal instanceof Date && bVal instanceof Date) {
+      return reverse ? bVal - aVal : aVal - bVal;
+    }
+    
+    // Handle mixed types - convert to strings
+    const aStr = String(aVal).toLowerCase();
+    const bStr = String(bVal).toLowerCase();
+    const comparison = aStr.localeCompare(bStr);
+    return reverse ? -comparison : comparison;
+  });
+  
+  return sortedData;
+}
+
+function getColumn(array, columnName) {
+  return array.map(row => row[columnName]);
+};
+
+function change(currentProgress){
+  if (currentProgress <= 1) {
+    barcharttest.update(precinct_data,"precinct","percent_jaywalking_summonses",null, null,"jaywalking summons");
+  }else if(currentProgress > 1 && currentProgress <2){
+    barcharttest.update(precinct_data,"precinct","percent_jaywalking_summonses",'yes', "percent_jaywalking_summonses","jaywalking summons",[25,28,32,33,76],["#660000","#1850b5","#ba9f64","#1f3a70","#b3b3ff"]);
+  } else if(currentProgress >= 2){
+    barcharttest.update(precinct_data,"precinct","percent_pedestrian_ksi",'yes','percent_pedestrian_ksi',"predestrian ksi",[25,28,32,33,76],["#660000","#1850b5","#ba9f64","#1f3a70","#b3b3ff"]);
+  }
+};
+
+test111 = await change(precinct_progress);
+```
+:::
+::::
+
+::: {.cr-section .bg-crosswalk layout="overlay-center"}
+<smallheader>The Impact of Legalization on Public Safety</smallheader><br> Both Denver and Virginia Beach implemented similar policy changes. Like NYC, jaywalking enforcement in both cities was low and inconsistent before decriminalization.
+
+We analyzed collision data from both cities to assess the impact of legalizing jaywalking on pedestrian safety. There was no clear evidence that decriminalization increased pedestrian-related crashes. Fluctuations in crash rates appeared to reflect broader traffic trends rather than changes in jaywalking laws.
+
+These case studies suggest that removing penalties for jaywalking does not necessarily compromise pedestrian safety—and can offer insight for cities considering similar reforms.
+:::
+
+:::: {.cr-section}
+<smallheader>A Pattern of Enforcement Disparity</smallheader><br> The racial disparity seen in jaywalking enforcement is not unique—it mirrors patterns across other forms of police contact in New York City, particularly in the enforcement of low-level offenses and investigatory stops. @cr-race-enforcement
+
+::: {#cr-race-enforcement}
+```{ojs}
+// Deep clone groupedbarchart as to not affect the original
+clonedGroupedBarChart = {
+  const original = groupedbarchart;
+  
+  // Create the new object first
+  const newChart = {
+    // Reset all instance properties to null/defaults
+    svg: null,
+    g: null,
+    tooltip: null,
+    x0: null,
+    x1: null,
+    y: null,
+    color: null,
+    width: 0,
+    height: 0,
+    currentData: null,
+
+    // Deep clone the config object
+    config: JSON.parse(JSON.stringify(original.config))
+  };
+  
+  // Now bind the methods to the new object
+  newChart.getUniqueValues = original.getUniqueValues.bind(newChart);
+  newChart.initialize = original.initialize.bind(newChart);
+  newChart.updateScales = original.updateScales.bind(newChart);
+  newChart.updateLegend = original.updateLegend.bind(newChart);
+  newChart.updateChart = original.updateChart.bind(newChart);
+  newChart.addBarEventListeners = original.addBarEventListeners.bind(newChart);
+  
+  return newChart;
+}
+
+clonedGroupedBarChart.initialize({groupColumn: "Category",
+    subgroupColumn: "Race", 
+    valueColumn: "Percentage",
+    colorScheme: d3.schemeCategory10,
+    transitionDuration: 200,
+    valueLabel: "Percentage (%)",
+    initialData: race_enforcement5_data});
+
+
+
+```
+
+```{ojs}
+race_enforcement5_data = FileAttachment("race_filtered_by_enforcement.csv").csv({typed: true})
+race_enforcement2_data = FileAttachment("race_filtered_by_enforcement_2.csv").csv({typed: true})
+
+function race_enforcement_update(currentprog) {
+  if(currentprog <=4.2){
+    clonedGroupedBarChart.updateChart(race_enforcement5_data);
+  }else {
+    clonedGroupedBarChart.updateChart(race_enforcement2_data);
+  }
+};
+
+test21 = await race_enforcement_update(race_enforcement_progress);
+```
+:::
+
+The Criminal Justice Reform Act (CJRA), passed in 2016, aimed to reduce criminal penalties for certain low-level offenses—like littering, public urination, and unreasonable noise—by allowing them to be handled with civil summonses. @cr-race-enforcement
+
+Between 2017 and 2024, Hispanic New Yorkers received 44.88% of CJRA-related criminal summonses, and Black New Yorkers received 38.63%, together making up over 83% of enforcement for these offenses. @cr-race-enforcement
+
+While not tied to low-level offenses, Stop-and-Frisk is a proactive policing tactic that has similarly disproportionate impacts. Between 2017 and 2024, 58.06% of those stopped were Black, and 29.87% were Hispanic, meaning nearly 9 in 10 stops involved Black or Hispanic individuals. @cr-race-enforcement
+
+When looking across all three enforcement areas—CJRA offenses, Stop-and-Frisk, and jaywalking—Black and Hispanic individuals made up at least 80% of those affected. This consistent pattern across different types of police contact highlights the role of race in enforcement outcomes during this period. @cr-race-enforcement
+::::
+
+::: {.cr-section .bg-crosswalk layout="overlay-center"}
+<smallheader>A Framework for Rethinking Enforcement</smallheader><br> Jaywalking may seem like a minor infraction, but the patterns surrounding its enforcement reveal broader questions about how cities regulate everyday behavior—and who bears the burden of that regulation.<br><br> In NYC, these insights helped shape the policy debate that led to Local Law 20 of 2024, which decriminalized jaywalking. By revealing enforcement disparities and a weak link to pedestrian safety, the analysis shifted focus from individual behavior to broader systemic patterns—patterns also seen in CJRA summonses and stop-and-frisk stops.<br><br> When policy decisions are grounded in evidence, cities can more effectively assess which laws serve their intended purpose and which may need to be reconsidered. This kind of data-driven framework supports more transparent, equitable, and accountable governance.
+:::
+
+```{ojs}
+//| output: false
+
+// SCROLL INTERACTION LOGIC
+progress = crTriggerIndex+crTriggerProgress
+
+// Delayed Progress for slower updates
+rounded_progress = Math.round(progress * 10) / 10;
+
+// Race Progress
+race_trigger = 1
+race_progress = (rounded_progress - race_trigger) < 0.6 ? 0 : (rounded_progress - race_trigger)
+
+// Precinct Progress
+precinct_trigger = 7
+precinct_progress = rounded_progress - precinct_trigger
+
+// Race Enforcement Progress
+race_enforcement_trigger = 11
+race_enforcement_progress = rounded_progress - race_enforcement_trigger
+
+```
+
+<!-- :::{.counter style="position: fixed; top: 100px; right: 10px; background-color: skyblue; border-radius: 5px; padding: 18px 18px 0 18px; line-height: .8em; font-size: 0.7em; opacity:0.75; z-index:99999;"}
+```{ojs}
+// borrowed from closeread.dev
+md`Active sticky: ${crActiveSticky}`
+md`Active trigger: ${crTriggerIndex}`
+md`Trigger progress: ${(crTriggerProgress * 100).toFixed(1)}%`
+md`Scroll direction: ${crDirection}`
+md`Progress Block progress: ${(crProgressBlock * 100).toFixed(1)}%`
+md`-----`
+md`progress: ${progress}`
+md`race_progress: ${race_progress}`
+md`precinct_progress: ${precinct_progress}`
+md`race_enforcement_progress: ${race_enforcement_progress}`
+md`roundedprogress: ${rounded_progress}`
+```
+::: -->

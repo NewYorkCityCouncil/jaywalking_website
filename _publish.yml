@@ -1,0 +1,4 @@
+- source: jaywalking.qmd
+  quarto-pub:
+    - id: 867ab8af-44c6-4e7f-bff0-a0f94dc32347
+      url: https://jwucouncil.quarto.pub/jaywalking

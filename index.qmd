@@ -21,10 +21,10 @@ Jaywalking has long been a technically illegal—but commonly overlooked—act i
 
 But in 2025, New York City repealed its jaywalking law, joining a growing number of cities that have chosen to stop criminalizing this everyday action. What led to this shift?
 
-Lets explore how data on enforcement patterns, public safety, and historical policy context helped shape the conversation around jaywalking—and how similar evidence-based approaches might support future legislation. 
+Lets explore how data on enforcement patterns, public safety, and historical policy context helped shape the conversation around jaywalking—and how similar evidence-based approaches might support future legislation.
 :::
 
-:::: {.cr-section}
+:::: cr-section
 <smallheader>Was Jaywalking Ever Really Enforced?</smallheader><br> Jaywalking enforcement in NYC has always been sparse. In 2024, just 867 summonses were issued citywide—a minuscule figure in a city of over 8 million people. Yet even this small number reveals patterns that raise questions about fairness and focus. <br> Despite the low number of summonses, the underlying question remains... @cr-summons-over-time
 
 ::: {#cr-summons-over-time}
@@ -63,7 +63,7 @@ Plot.plot({x: {
 ```
 
 ```{ojs}
-summons_csv = FileAttachment("jaywalking-crim-summonses_quarterly.csv").csv({typed: true})
+summons_csv = FileAttachment("https://newyorkcitycouncil.github.io/jaywalking-crim-summonses_quarterly.csv").csv({typed: true})
 
 summons_data = summons_csv.map(d => ({
   ...d,
@@ -76,11 +76,11 @@ yearTicks = summons_data.filter(d => d.quarter.endsWith("Q1")).map(d => d.quarte
 :::
 ::::
 
-:::: {.cr-section .bg-crosswalk layout="overlay-center"}
+::: {.cr-section .bg-crosswalk layout="overlay-center"}
 Who is most affected by these rarely enforced violations?
-::::
+:::
 
-:::: {.cr-section}
+:::: cr-section
 <smallheader>Racial Disparities in Enforcement</smallheader><br> Enforcement of jaywalking laws in New York City revealed significant racial and geographic disparities. @cr-race
 
 ::: {#cr-race}
@@ -486,8 +486,8 @@ function race_update(currentprog) {
 ```
 
 ```{ojs}
-jwalkrace5_data = FileAttachment("jaywalking_race_5.csv").csv({typed: true})
-jwalkrace2_data = FileAttachment("jaywalking_race_2.csv").csv({typed: true})
+jwalkrace5_data = FileAttachment("https://newyorkcitycouncil.github.io/jaywalking_race_5.csv").csv({typed: true})
+jwalkrace2_data = FileAttachment("https://newyorkcitycouncil.github.io/jaywalking_race_2.csv").csv({typed: true})
 
 initial_data = jwalkrace5_data.filter(function(d){ return d.year < 2018 });
 
@@ -497,7 +497,7 @@ test212 = race_update(race_progress)
 
 Throughout the years, Black individuals have accounted for 40% to 70% of jaywalking summonses, while Hispanic individuals have consistently accounted for 30% to 37%. @cr-race
 
-In 2024 alone, 62% of summonses were issued to Black individuals and 31% to Hispanic individuals. [@cr-race]{pan-to="-70%,-15%" scale-by="2.5"}
+In 2024 alone, 62% of summonses were issued to Black individuals and 31% to Hispanic individuals. @cr-race
 
 This means that, historically, Black and Hispanic individuals have accounted for at least 80% of all jaywalking summonses, with 2024 reaching the highest recorded share at 93%. Despite this disproportionate distribution of enforcement, there is no evidence to suggest that over 90% of jaywalking in the city is committed by individuals from these communities. Many have argued that jaywalking summonses have often been used as a pretext to target Black and Latino New Yorkers. @cr-race
 ::::
@@ -520,7 +520,7 @@ This means that, historically, Black and Hispanic individuals have accounted for
 There is little evidence to support the claim that decriminalizing jaywalking will result in a more dangerous experience for pedestrians. Neither the Mayor’s administration nor the NYPD appears to view jaywalking enforcement as a safety measure, given that only 47 of the City’s 77 precincts issued jaywalking summonses in 2023. Additionally, jaywalking enforcement has not consistently targeted the areas where pedestrians are most often injured.
 :::
 
-:::: {.cr-section}
+:::: cr-section
 Priority zones—areas the city has identified as having the highest rates of pedestrian injuries and deaths—are home to a significant portion of both pedestrian fatalities and enforcement. These zones are approximately 73% non-white, and account for 52% of all pedestrian-related deaths citywide. Yet, 58% of jaywalking summonses are issued in these same zones—92% of them to non-white individuals. @cr-leafletmap2
 
 ::: {#cr-leafletmap2}
@@ -530,12 +530,12 @@ Priority zones—areas the city has identified as having the highest rates of pe
 :::
 ::::
 
-:::: {.cr-section}
+:::: cr-section
 The racial disparity is clear, but the alignment with pedestrian danger is not always consistent. @cr-precincts
 
-Five precincts ([**25**]{style="color:#660000;"}, [**28**]{style="color:#1850b5;"}, [**32**]{style="color:#ba9f64;"}, [**33**]{style="color:#1f3a70;"}, and [**76**]{style="color:#b3b3ff;"}), for instance, are in the top 25th percentile for jaywalking summonses [@cr-precincts]{pan-to="35%,65%" scale-by="1.75"}
+Five precincts ([**25**]{style="color:#660000;"}, [**28**]{style="color:#1850b5;"}, [**32**]{style="color:#ba9f64;"}, [**33**]{style="color:#1f3a70;"}, and [**76**]{style="color:#b3b3ff;"}), for instance, are in the top 25th percentile for jaywalking summonses @cr-precincts
 
-Yet fall in the bottom 25th percentile for pedestrian-related car crashes. This mismatch suggests that enforcement may not be driven by safety considerations alone. [@cr-precincts]{pan-to="60%,-60%" scale-by="2.5"}
+Yet fall in the bottom 25th percentile for pedestrian-related car crashes. This mismatch suggests that enforcement may not be driven by safety considerations alone. @cr-precincts
 
 While we don't see a clear link between pedestrian-related crashes and jaywalking summonses, another question comes up: will legalizing jaywalking lead to more pedestrian crashes? To assess whether decriminalizing jaywalking compromises safety, we looked at peer cities that have repealed similar laws. @cr-precincts
 
@@ -716,7 +716,7 @@ barcharttest = Plot.plot({
 ```
 
 ```{ojs}
-precinct_data = FileAttachment("summonses-vs-ksi_by-precinct_2017-2024.csv").csv({typed: true});
+precinct_data = FileAttachment("https://newyorkcitycouncil.github.io/summonses-vs-ksi_by-precinct_2017-2024.csv").csv({typed: true});
 
 function sortData(data, columnName, reverse = false) {
   // Validate inputs
@@ -799,7 +799,7 @@ We analyzed collision data from both cities to assess the impact of legalizing j
 These case studies suggest that removing penalties for jaywalking does not necessarily compromise pedestrian safety—and can offer insight for cities considering similar reforms.
 :::
 
-:::: {.cr-section}
+:::: cr-section
 <smallheader>A Pattern of Enforcement Disparity</smallheader><br> The racial disparity seen in jaywalking enforcement is not unique—it mirrors patterns across other forms of police contact in New York City, particularly in the enforcement of low-level offenses and investigatory stops. @cr-race-enforcement
 
 ::: {#cr-race-enforcement}
@@ -850,8 +850,8 @@ clonedGroupedBarChart.initialize({groupColumn: "Category",
 ```
 
 ```{ojs}
-race_enforcement5_data = FileAttachment("race_filtered_by_enforcement.csv").csv({typed: true})
-race_enforcement2_data = FileAttachment("race_filtered_by_enforcement_2.csv").csv({typed: true})
+race_enforcement5_data = FileAttachment("https://newyorkcitycouncil.github.io/race_filtered_by_enforcement.csv").csv({typed: true})
+race_enforcement2_data = FileAttachment("https://newyorkcitycouncil.github.io/race_filtered_by_enforcement_2.csv").csv({typed: true})
 
 function race_enforcement_update(currentprog) {
   if(currentprog <=4.2){
@@ -901,6 +901,7 @@ race_enforcement_progress = rounded_progress - race_enforcement_trigger
 
 ```
 
+````{=html}
 <!-- :::{.counter style="position: fixed; top: 100px; right: 10px; background-color: skyblue; border-radius: 5px; padding: 18px 18px 0 18px; line-height: .8em; font-size: 0.7em; opacity:0.75; z-index:99999;"}
 ```{ojs}
 // borrowed from closeread.dev
@@ -917,3 +918,4 @@ md`race_enforcement_progress: ${race_enforcement_progress}`
 md`roundedprogress: ${rounded_progress}`
 ```
 ::: -->
+````

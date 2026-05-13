@@ -496,7 +496,7 @@ test212 = race_update(race_progress)
 
 Throughout the years, Black individuals have accounted for 40% to 70% of jaywalking summonses, while Hispanic individuals have consistently accounted for 30% to 37%. @cr-race
 
-In 2024 alone, 62% of summonses were issued to Black individuals and 31% to Hispanic individuals. @cr-race
+In 2024 alone, 62% of summonses were issued to Black individuals and 31% to Hispanic individuals. [@cr-race]{pan-to="-70%,-15%" scale-by="2.5"}
 
 This means that, historically, Black and Hispanic individuals have accounted for at least 80% of all jaywalking summonses, with 2024 reaching the highest recorded share at 93%. Despite this disproportionate distribution of enforcement, there is no evidence to suggest that over 90% of jaywalking in the city is committed by individuals from these communities. Many have argued that jaywalking summonses have often been used as a pretext to target Black and Latino New Yorkers. @cr-race
 ::::
@@ -532,9 +532,9 @@ Priority zones—areas the city has identified as having the highest rates of pe
 :::: cr-section
 The racial disparity is clear, but the alignment with pedestrian danger is not always consistent. @cr-precincts
 
-Five precincts ([**25**]{style="color:#660000;"}, [**28**]{style="color:#1850b5;"}, [**32**]{style="color:#ba9f64;"}, [**33**]{style="color:#1f3a70;"}, and [**76**]{style="color:#b3b3ff;"}), for instance, are in the top 25th percentile for jaywalking summonses @cr-precincts
+Five precincts ([**25**]{style="color:#660000;"}, [**28**]{style="color:#1850b5;"}, [**32**]{style="color:#ba9f64;"}, [**33**]{style="color:#1f3a70;"}, and [**76**]{style="color:#b3b3ff;"}), for instance, are in the top 25th percentile for jaywalking summonses [@cr-precincts]{pan-to="35%,65%" scale-by="1.75"}
 
-Yet fall in the bottom 25th percentile for pedestrian-related car crashes. This mismatch suggests that enforcement may not be driven by safety considerations alone. @cr-precincts
+Yet fall in the bottom 25th percentile for pedestrian-related car crashes. This mismatch suggests that enforcement may not be driven by safety considerations alone. [@cr-precincts]{pan-to="60%,-60%" scale-by="2.5"}
 
 While we don't see a clear link between pedestrian-related crashes and jaywalking summonses, another question comes up: will legalizing jaywalking lead to more pedestrian crashes? To assess whether decriminalizing jaywalking compromises safety, we looked at peer cities that have repealed similar laws. @cr-precincts
 

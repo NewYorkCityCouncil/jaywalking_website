@@ -1,0 +1,19 @@
+Race,Category,Percentage
+HISPANIC,CJRA,44.88
+BLACK,CJRA,38.63
+WHITE,CJRA,9.39
+UNKNOWN,CJRA,4.13
+ASIAN / PACIFIC ISLANDER,CJRA,2.62
+OTHER,CJRA,0.36
+ASIAN / PACIFIC ISLANDER,Stop and Frisk,1.95
+BLACK,Stop and Frisk,58.06
+HISPANIC,Stop and Frisk,29.87
+OTHER,Stop and Frisk,0.77
+UNKNOWN,Stop and Frisk,2
+WHITE,Stop and Frisk,7.35
+ASIAN / PACIFIC ISLANDER,Jaywalking,1.7
+BLACK,Jaywalking,57.33
+HISPANIC,Jaywalking,32.27
+OTHER,Jaywalking,0.15
+UNKNOWN,Jaywalking,1.3
+WHITE,Jaywalking,7.25

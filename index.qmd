@@ -63,8 +63,7 @@ Plot.plot({x: {
 ```
 
 ```{ojs}
-summons_csv = FileAttachment("https://newyorkcitycouncil.github.io/jaywalking-crim-summonses_quarterly.csv").csv({typed: true})
-
+summons_csv = FileAttachment("https://raw.githubusercontent.com/NewYorkCityCouncil/jaywalking_website/refs/heads/main/docs/jaywalking-crim-summonses_quarterly.csv").csv({typed: true})
 summons_data = summons_csv.map(d => ({
   ...d,
   total_summonses: +d.total_summonses,
@@ -486,8 +485,8 @@ function race_update(currentprog) {
 ```
 
 ```{ojs}
-jwalkrace5_data = FileAttachment("https://newyorkcitycouncil.github.io/jaywalking_race_5.csv").csv({typed: true})
-jwalkrace2_data = FileAttachment("https://newyorkcitycouncil.github.io/jaywalking_race_2.csv").csv({typed: true})
+jwalkrace5_data = FileAttachment("https://raw.githubusercontent.com/NewYorkCityCouncil/jaywalking_website/refs/heads/main/docs/jaywalking_race_5.csv").csv({typed: true})
+jwalkrace2_data = FileAttachment("https://raw.githubusercontent.com/NewYorkCityCouncil/jaywalking_website/refs/heads/main/docs/jaywalking_race_2.csv").csv({typed: true})
 
 initial_data = jwalkrace5_data.filter(function(d){ return d.year < 2018 });
 
@@ -716,7 +715,7 @@ barcharttest = Plot.plot({
 ```
 
 ```{ojs}
-precinct_data = FileAttachment("https://newyorkcitycouncil.github.io/summonses-vs-ksi_by-precinct_2017-2024.csv").csv({typed: true});
+precinct_data = FileAttachment("https://raw.githubusercontent.com/NewYorkCityCouncil/jaywalking_website/refs/heads/main/docs/summonses-vs-ksi_by-precinct_2017-2024.csv").csv({typed: true});
 
 function sortData(data, columnName, reverse = false) {
   // Validate inputs
@@ -850,8 +849,8 @@ clonedGroupedBarChart.initialize({groupColumn: "Category",
 ```
 
 ```{ojs}
-race_enforcement5_data = FileAttachment("https://newyorkcitycouncil.github.io/race_filtered_by_enforcement.csv").csv({typed: true})
-race_enforcement2_data = FileAttachment("https://newyorkcitycouncil.github.io/race_filtered_by_enforcement_2.csv").csv({typed: true})
+race_enforcement5_data = FileAttachment("https://raw.githubusercontent.com/NewYorkCityCouncil/jaywalking_website/refs/heads/main/docs/race_filtered_by_enforcement.csv").csv({typed: true})
+race_enforcement2_data = FileAttachment("https://raw.githubusercontent.com/NewYorkCityCouncil/jaywalking_website/refs/heads/main/docs/race_filtered_by_enforcement_2.csv").csv({typed: true})
 
 function race_enforcement_update(currentprog) {
   if(currentprog <=4.2){
